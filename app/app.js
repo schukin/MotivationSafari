@@ -3,20 +3,19 @@
 var $  = document.getElementById.bind(document);
 var $$ = document.querySelectorAll.bind(document);
 
-var App = function($el){
-  this.$el = $el;
+var App = function($content, $footer){
+  this.$content = $content;
+  this.$footer = $footer;
   this.load();
-  this.renderAgeLoop();
+  this.$footer.addEventListener('click', this.hideOrShowButtonClicked.bind(this));
 
-  console.log("Test 1");
+  this.renderAgeLoop();
 };
 
 App.fn = App.prototype;
 
 App.fn.load = function(){
   var value;
-
-  this.dob = null;
 
   if (value = localStorage.dob) {
     this.dob = new Date(parseInt(value));
@@ -28,7 +27,35 @@ App.fn.load = function(){
     this.lastUpdated = new Date(parseInt(lastUpdated));
   }
 
+  var hidden;
+
+  if (hidden = localStorage.hidden) {
+    this.hidden = (hidden == "true" ? true : false);
+  } else {
+    this.hidden = false;
+  }
+
+  this.updateHideOrShowButton();
   this.fetchHorizon();
+};
+
+App.fn.hideOrShowButtonClicked = function(e) {
+  e.preventDefault();
+
+  var hidden = !this.hidden;
+  this.hidden = hidden;
+  var hiddenString = this.hidden.toString();
+  localStorage.hidden = hiddenString;
+  console.log("hiddenString: " + hiddenString);
+  this.updateHideOrShowButton();
+};
+
+App.fn.updateHideOrShowButton = function() {
+  var hideOrShowLabel = this.hidden ? 'Show' : 'Hide';
+
+  this.setFooter(this.view('hide-show-button')({
+      hideOrShowLabel: hideOrShowLabel
+    }));
 };
 
 App.fn.save = function(){
@@ -63,32 +90,8 @@ App.fn.renderAgeLoop = function(){
   this.interval = setInterval(this.renderAge.bind(this), 100);
 };
 
-App.fn.calculateAge = function(){
-  var now   = new Date
-  var age   = now.getFullYear() - this.dob.getFullYear();
-  var mDiff = now.getMonth() - this.dob.getMonth();
-
-  if (mDiff < 0 || (mDiff === 0 && now.getDate() < this.dob.getDate())) {
-    age--;
-  }
-
-  return age;
-};
-
-App.fn.calculateMS = function(){
-  var now            = new Date
-  var janOne         = new Date(now.getFullYear(), 0, 1);
-  var comingBirthday = new Date(this.dob.getTime());
-  var ms;
-
-  comingBirthday.setYear(now.getFullYear());
-  ms = (now.getTime() - janOne.getTime()) / (comingBirthday.getTime() - janOne.getTime());
-
-  return ms.toFixed(9).toString().split('.')[1];
-};
-
 App.fn.renderAge = function(){
-  var now       = new Date();
+  var now       = new Date
   var duration  = this.dob - now;
   var years     = duration / 31556900000;
   var days      = duration / 86400000;
@@ -96,14 +99,32 @@ App.fn.renderAge = function(){
   var majorMinor = days.toFixed(9).toString().split('.');
   var app = this;
   var lastUpdatedString = this.lastUpdatedString;
+  var hidden = this.hidden;
+  var helloText = this.getHelloText() + " :)";
 
   requestAnimationFrame(function(){
-    this.html(this.view('age')({
+    this.setContent(this.view('age')({
       year:         majorMinor[0],
       milliseconds: majorMinor[1],
-      noticeText:   lastUpdatedString
+      noticeText:   lastUpdatedString,
+      hidden:       hidden,
+      helloText:    helloText
     }));
   }.bind(this));
+};
+
+App.fn.getHelloText = function() {
+  var hourOfDay = (new Date()).getHours();
+
+  if (hourOfDay >= 4 && hourOfDay < 12) {
+    return "Good morning";
+  } else if (hourOfDay >= 12 && hourOfDay < 18) {
+    return "Good afternoon";
+  } else if (hourOfDay >= 18 || hourOfDay < 4) {
+    return "Good evening";
+  } else {
+    return "Hello " + hourOfDay;
+  }
 };
 
 App.fn.newLastUpdatedString = function() {
@@ -153,8 +174,12 @@ App.fn.$$ = function(sel){
   return this.$el.querySelectorAll(sel);
 };
 
-App.fn.html = function(html){
-  this.$el.innerHTML = html;
+App.fn.setContent = function(html){
+  this.$content.innerHTML = html;
+};
+
+App.fn.setFooter = function(html){
+  this.$footer.innerHTML = html;
 };
 
 App.fn.view = function(name){
@@ -162,6 +187,6 @@ App.fn.view = function(name){
   return Handlebars.compile($el.innerHTML);
 };
 
-window.app = new App($('app'))
+window.app = new App($('content'), $('footer'))
 
 })();

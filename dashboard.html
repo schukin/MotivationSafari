@@ -10,7 +10,10 @@
 </head>
 <body>
 
-<div id="app"></div>
+<div id="app">
+  <div id="content"></div>
+  <div id="footer"></div>
+</div>
 
 <script id="dob-template" type="text/x-handlebars-template">
   <form>
@@ -24,9 +27,17 @@
 </script>
 
 <script id="age-template" type="text/x-handlebars-template">
-  <h1 class="age-label">DAYS REMAINING</h1>
-  <h2 class="count">{{year}}<sup>.{{milliseconds}}</sup></h2>
-  <h3 class="notice-label">{{noticeText}}</h1>
+  {{#if hidden}}
+    <h1 class="hello-label">{{helloText}}</h1>
+  {{else}}
+    <h1 class="age-label">DAYS REMAINING</h1>
+    <h2 class="count">{{year}}<sup>.{{milliseconds}}</sup></h2>
+    <h3 class="notice-label">{{noticeText}}</h1>
+  {{/if}}
+</script>
+
+<script id="hide-show-button-template" type="text/x-handlebars-template">
+  <button type="button" id="hide-show-button" class="hide-show-button">{{hideOrShowLabel}}</button>
 </script>
 
 <script src="js/handlebars.js"></script>

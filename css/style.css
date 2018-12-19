@@ -29,7 +29,7 @@ body, input {
   background-color: #222222;
 }
 
-.age-label {
+.age-label, .hello-label {
   color: #B0B5B9;
   font-size: 1.8rem;
   line-height: 1;
@@ -39,6 +39,20 @@ body, input {
 .notice-label {
   color: #B0B5B9;
   margin-top: 0;
+}
+
+.hide-show-button {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  font-size: 12px;
+  background-color: transparent;
+  color: #444;
+}
+
+.hide-show-button:hover {
+  text-decoration: underline;
+  color: #aaa;
 }
 
 .count {
