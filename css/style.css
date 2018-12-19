@@ -36,6 +36,11 @@ body, input {
   margin: 0 0 0 2px;
 }
 
+.notice-label {
+  color: #B0B5B9;
+  margin-top: 0;
+}
+
 .count {
   color: #dcdcdc;
   margin: 0;
